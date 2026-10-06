@@ -3,6 +3,8 @@ import { escapeHtml as esc } from "../lib/dom";
 import { focusColor } from "../lib/focus";
 import type { Lecture } from "../lib/types";
 
+const pxToRem = (value: number) => `${value / 16}rem`;
+
 /** Returns one course time for a date. */
 function eventTime(course: Lecture, iso: string) {
   return course.event_times[iso] || { start: null, end: null };
@@ -45,7 +47,7 @@ export function weekCalendar(courses: Lecture[], selected: Date) {
   const axis = Array.from(
     { length: 14 },
     (_, index) =>
-      `<span class="hour" style="top:${index * 60}px">${String(index + 8).padStart(2, "0")}:00</span>`,
+      `<span class="hour" style="top:${pxToRem(index * 60)}">${String(index + 8).padStart(2, "0")}:00</span>`,
   ).join("");
   const columns = days
     .map((day) => {
@@ -77,6 +79,6 @@ function timedEvent(
     const [endHour, endMinute] = time.end.split(":").map(Number);
     height = Math.max(28, endHour * 60 + endMinute - (hour * 60 + minute));
   }
-  const lane = `left:calc(${(index * 100) / count}% + 3px);right:auto;width:calc(${100 / count}% - 6px)`;
-  return `<a class="week-event" style="--type:${focusColor(course)};top:${Math.max(0, top)}px;height:${height}px;${lane}" href="#${course.id}" data-course-link><span>${esc(timeLabel(time))}</span><strong>${esc(course.title_en)}</strong><span class="week-meta">${esc(eventMeta(course))}</span></a>`;
+  const lane = `left:calc(${(index * 100) / count}% + ${pxToRem(3)});right:auto;width:calc(${100 / count}% - ${pxToRem(6)})`;
+  return `<a class="week-event" style="--type:${focusColor(course)};top:${pxToRem(Math.max(0, top))};height:${pxToRem(height)};${lane}" href="#${course.id}" data-course-link><span>${esc(timeLabel(time))}</span><strong>${esc(course.title_en)}</strong><span class="week-meta">${esc(eventMeta(course))}</span></a>`;
 }

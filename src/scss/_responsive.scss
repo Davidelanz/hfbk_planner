@@ -1,5 +1,5 @@
 /* Responsive overrides for stacked layouts and compact course cards. */
-@media (max-width: 900px) {
+@media (max-width: 56.25rem) {
   .layout {
     grid-template-columns: 1fr;
   }
@@ -7,14 +7,14 @@
     position: static;
     background-color: #eeeeee;
     height: auto;
-    padding: 12px 9px;
+    padding: 0.75rem 0.5625rem;
     border-right: 0;
-    border-radius: 10px;
+    border-radius: 0.625rem;
     .side-section {
-      margin-top: 0px;
+      margin-top: 0;
     }
     .side-title {
-      padding: 16px 0 0;
+      padding: 1rem 0 0;
     }
   }
   .columns {
@@ -22,35 +22,32 @@
   }
   .lang + .lang {
     border-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: 0.0625rem solid var(--line);
   }
   .site-header {
     align-items: flex-start;
     flex-direction: column;
   }
   .cal-grid {
-    min-width: 800px;
+    min-width: 50rem;
   }
   .calendar-wrap {
     overflow-x: auto;
   }
 }
-@media (max-width: 560px) {
+@media (max-width: 35rem) {
   html {
-    font-size: 14px;
-  }
-  body {
-    font-size: 14px;
+    font-size: 87.5%;
   }
   .shell {
-    padding: 12px;
+    padding: 0.75rem;
   }
   .questions {
-    padding: 14px;
+    padding: 0.875rem;
   }
   .lecture-body,
   summary {
-    padding: 15px;
+    padding: 0.9375rem;
   }
   .sum-title {
     font-size: 1rem;

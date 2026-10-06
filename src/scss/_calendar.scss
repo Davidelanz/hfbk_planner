@@ -3,8 +3,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
 
   h2 {
     margin: 0;
@@ -15,7 +15,7 @@
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 0.375rem;
 }
 .dow {
   text-align: center;
@@ -23,14 +23,14 @@
   font-weight: 850;
   text-transform: uppercase;
   color: var(--muted);
-  padding: 7px;
+  padding: 0.4375rem;
 }
 .day {
-  min-height: 112px;
+  min-height: 7rem;
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 8px;
+  border: 0.0625rem solid var(--line);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
 
   &.out {
     opacity: 0.35;
@@ -41,12 +41,12 @@
 }
 .eventdot {
   display: block;
-  margin-top: 5px;
-  border-left: 4px solid var(--type, #777);
+  margin-top: 0.3125rem;
+  border-left: 0.25rem solid var(--type, #777);
   background: color-mix(in srgb, var(--type) 12%, white);
   color: var(--ink);
-  border-radius: 5px;
-  padding: 4px 5px;
+  border-radius: 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 0.7rem;
   line-height: 1.25;
   overflow: hidden;
@@ -58,14 +58,14 @@
 }
 .week-wrap {
   overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border: 0.0625rem solid var(--line);
+  border-radius: 0.875rem;
   background: #fff;
 }
 .week-grid {
   display: grid;
-  grid-template-columns: 64px repeat(7, minmax(125px, 1fr));
-  min-width: 980px;
+  grid-template-columns: 4rem repeat(7, minmax(7.8125rem, 1fr));
+  min-width: 61.25rem;
 }
 .week-corner,
 .week-head {
@@ -73,12 +73,12 @@
   top: 0;
   z-index: 4;
   background: #fff;
-  border-bottom: 1px solid var(--line);
-  padding: 9px;
+  border-bottom: 0.0625rem solid var(--line);
+  padding: 0.5625rem;
   text-align: center;
 }
 .week-head {
-  border-left: 1px solid var(--line);
+  border-left: 0.0625rem solid var(--line);
 
   strong,
   span {
@@ -91,17 +91,17 @@
   }
 }
 .all-day-label {
-  padding: 8px 4px;
+  padding: 0.5rem 0.25rem;
   color: var(--muted);
   font-size: 0.7rem;
   text-align: center;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0.0625rem solid var(--line);
 }
 .all-day {
-  min-height: 42px;
-  padding: 4px;
-  border-left: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  min-height: 2.625rem;
+  padding: 0.25rem;
+  border-left: 0.0625rem solid var(--line);
+  border-bottom: 0.0625rem solid var(--line);
 }
 .untimed {
   display: block;
@@ -109,11 +109,11 @@
   text-decoration: none;
   font-size: 0.69rem;
   line-height: 1.2;
-  border-left: 4px solid var(--type);
+  border-left: 0.25rem solid var(--type);
   background: color-mix(in srgb, var(--type) 14%, white);
-  padding: 4px;
-  margin: 2px 0;
-  border-radius: 4px;
+  padding: 0.25rem;
+  margin: 0.125rem 0;
+  border-radius: 0.25rem;
 
   .week-meta {
     display: block;
@@ -121,47 +121,47 @@
 }
 .time-axis {
   position: relative;
-  height: 780px;
+  height: 48.75rem;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent 59px,
-    var(--line) 60px
+    transparent 3.6875rem,
+    var(--line) 3.75rem
   );
 }
 .hour {
   position: absolute;
-  right: 7px;
+  right: 0.4375rem;
   transform: translateY(-0.65em);
   color: var(--muted);
   font-size: 0.69rem;
 }
 .week-day {
   position: relative;
-  height: 780px;
-  border-left: 1px solid var(--line);
+  height: 48.75rem;
+  border-left: 0.0625rem solid var(--line);
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent 59px,
-    var(--line) 60px
+    transparent 3.6875rem,
+    var(--line) 3.75rem
   );
 }
 .week-event {
   position: absolute;
-  left: 4px;
-  right: 4px;
+  left: 0.25rem;
+  right: 0.25rem;
   z-index: 2;
-  border-left: 5px solid var(--type);
+  border-left: 0.3125rem solid var(--type);
   background: color-mix(in srgb, var(--type) 18%, white);
   color: var(--ink);
   text-decoration: none;
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: 0.375rem;
+  padding: 0.3125rem;
   overflow: hidden;
   font-size: 0.7rem;
   line-height: 1.2;
-  box-shadow: 0 1px 3px #0002;
+  box-shadow: 0 0.0625rem 0.1875rem #0002;
 
   strong,
   span {
@@ -169,12 +169,12 @@
   }
 
   span {
-    margin-bottom: 2px;
+    margin-bottom: 0.125rem;
   }
 }
 
 .week-meta {
-  margin-top: 3px;
+  margin-top: 0.1875rem;
   font-size: 0.65rem;
   line-height: 1.25;
   opacity: 0.78;
