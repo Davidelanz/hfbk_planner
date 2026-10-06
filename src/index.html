@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HFBK · Course planner</title>
+    <meta
+      name="description"
+      content="Interactive bilingual HFBK course catalog with calendar and saved subject filters."
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2317191f'/%3E%3Cpath d='M15 18h34v28H15z' fill='none' stroke='%23ffcf4a' stroke-width='5'/%3E%3Cpath d='M27 18v28' stroke='%23ffcf4a' stroke-width='5'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/scss/main.scss" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="site-header">
+        <span class="wordmark">HFBK</span
+        ><span class="eyebrow">Course planner</span>
+      </header>
+      <div class="layout">
+        <aside class="sidebar" aria-label="Filters">
+          <section class="side-section">
+            <h2 class="side-title">Find a course</h2>
+            <input
+              id="search"
+              class="search"
+              type="search"
+              placeholder="Title, teacher, room..."
+            />
+          </section>
+          <section class="side-section">
+            <details class="filter-group">
+              <summary class="side-title">
+                <span>Subjects</span
+                ><svg
+                  class="disclosure"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <path d="m6 3 5 5-5 5" />
+                </svg>
+              </summary>
+              <div class="filter-content">
+                <div id="subjects" class="subject-list"></div>
+              </div>
+            </details>
+          </section>
+          <section class="side-section">
+            <details class="filter-group">
+              <summary class="side-title">
+                <span>Course types</span
+                ><svg
+                  class="disclosure"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <path d="m6 3 5 5-5 5" />
+                </svg>
+              </summary>
+              <div class="filter-content">
+                <div id="types" class="subject-list"></div>
+              </div>
+            </details>
+          </section>
+          <section class="side-section">
+            <h2 class="side-title">My possible courses</h2>
+            <p>
+              <small
+                >Only included courses appear in calendars and conflict
+                analysis.</small
+              >
+            </p>
+            <div class="btnrow">
+              <button id="includeAll" class="mini">Include all</button
+              ><button id="excludeAll" class="mini">Exclude all</button>
+            </div>
+          </section>
+          <section class="side-section">
+            <h2 class="side-title">Saved lists</h2>
+            <div class="savebox">
+              <input id="listName" placeholder="e.g. My shortlist" /><button
+                id="saveList"
+                class="mini"
+              >
+                Save
+              </button>
+            </div>
+            <div id="savedLists" class="saved"></div>
+          </section>
+          <section class="side-section">
+            <button id="reset" class="btn dark">Reset all filters</button>
+          </section>
+        </aside>
+        <section class="content">
+          <div class="toolbar">
+            <div class="count" id="count"></div>
+            <div class="btnrow">
+              <button id="expandAll" class="btn">Expand all</button
+              ><button id="collapseAll" class="btn">Collapse all</button>
+            </div>
+          </div>
+          <div
+            id="legend"
+            class="legend"
+            aria-label="Schwerpunkt color legend"
+          ></div>
+          <nav class="viewtabs" aria-label="Views">
+            <button class="btn active" data-view="courses">Courses</button
+            ><button class="btn" data-view="month">Month</button
+            ><button class="btn" data-view="week">Week</button
+            ><button class="btn" data-view="conflicts">Conflicts</button
+            ><button class="btn" data-view="questions">Needs your input</button
+            ><button class="btn" data-view="dataGuide">
+              How to upload data
+            </button>
+          </nav>
+          <div id="courses" class="panel active">
+            <div id="lectureList" class="lecture-list"></div>
+          </div>
+          <div id="month" class="panel">
+            <div class="calendar-head">
+              <button id="prevMonth" class="btn" aria-label="Previous month">
+                Previous
+              </button>
+              <h2 id="monthTitle"></h2>
+              <button id="nextMonth" class="btn" aria-label="Next month">
+                Next
+              </button>
+            </div>
+            <div class="calendar-wrap">
+              <div id="calGrid" class="cal-grid"></div>
+            </div>
+          </div>
+          <div id="week" class="panel">
+            <div class="calendar-head">
+              <button id="prevWeek" class="btn" aria-label="Previous week">
+                Previous
+              </button>
+              <h2 id="weekTitle"></h2>
+              <button id="nextWeek" class="btn" aria-label="Next week">
+                Next
+              </button>
+            </div>
+            <div class="week-wrap">
+              <div id="weekGrid" class="week-grid"></div>
+            </div>
+          </div>
+          <div id="conflicts" class="panel">
+            <div class="questions">
+              <h2>Courses with the most conflicts</h2>
+              <p>
+                Ranked using included courses and overlapping dated times.
+                Events with no time are not counted.
+              </p>
+              <div id="conflictList"></div>
+            </div>
+          </div>
+          <div id="questions" class="panel">
+            <div class="questions">
+              <h2>Details to confirm</h2>
+              <p>
+                Each course below lists the exact missing fields needed to
+                complete its calendar entry.
+              </p>
+              <div id="questionList"></div>
+            </div>
+          </div>
+          <div id="dataGuide" class="panel">
+            <div class="questions uploadbox">
+              <h2>Use your own course file</h2>
+              <p>
+                JSON is a plain-text file that keeps information in labelled
+                boxes for course names, texts, dates, and rooms. You do not
+                need to program. Keep the structure below, replace the example
+                information, save it as <code>data.json</code>, and choose it
+                here.
+              </p>
+              <p>
+                The file is read only in your browser. It is not uploaded or
+                published. Export first if you want to keep changes to “In plan”
+                or “Registered”.
+              </p>
+              <div class="upload-actions">
+                <input
+                  id="jsonUpload"
+                  type="file"
+                  accept=".json,application/json"
+                /><button id="downloadJson" class="btn">
+                  Export current JSON
+                </button>
+              </div>
+              <p id="jsonStatus" class="status" role="status"></p>
+              <details class="schema-help">
+                <summary>Show the JSON structure</summary>
+                <pre class="schema-example">
+{
+  "schema_version": 1,
+  "courses": [{
+    "id": "unique-id",
+    "plan": true,
+    "classification": {"subject": "Film", "type": "Seminar"},
+    "text": {"en": {"title": "...", "body": "..."}, "de": {"title": "...", "body": "..."}},
+    "details": {"instructors": "...", "room": "..."},
+    "registration": {"registered": false, "email": "name@example.org"},
+    "calendar": {"events": [["2026-10-15", "10:00", "13:00"]]},
+    "source": {"pdf_page": 10}
+  }]
+}</pre>
+              </details>
+              <p>
+                Repeating courses may add <code>calendar.recurrence</code> and
+                <code>semester_break_excluded</code>. List missing fields in
+                <code>calendar.needs_input</code>.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/ts/app.ts"></script>
+  </body>
+</html>

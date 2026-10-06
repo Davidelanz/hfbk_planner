@@ -1,0 +1,76 @@
+/* Feedback views: missing data, conflicts, and JSON import guidance. */
+.questions {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+}
+.question {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+
+  &:first-of-type {
+    border-top: 0;
+  }
+
+  a {
+    color: var(--blue);
+  }
+}
+.conflict-row {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+.conflict-score {
+  display: inline-block;
+  background: #ffe0db;
+  color: #9b2f20;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  margin-left: 7px;
+}
+.conflict-partners {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+.missing-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.15rem;
+  color: #765200;
+}
+.uploadbox {
+  display: grid;
+  gap: 14px;
+}
+.upload-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+
+  input {
+    max-width: 100%;
+  }
+}
+.schema-example {
+  overflow: auto;
+  background: #17191f;
+  color: #f7f3e8;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+}
+.status {
+  min-height: 1.5em;
+  color: var(--muted);
+}

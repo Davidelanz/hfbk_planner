@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "courses": [
+    {
+      "id": "studio-practice",
+      "plan": true,
+      "classification": {
+        "subject": "Fine Arts",
+        "type": "Seminar"
+      },
+      "text": {
+        "en": {
+          "title": "Studio Practice",
+          "body": "A short description of the course."
+        },
+        "de": {
+          "title": "Atelierpraxis",
+          "body": "Eine kurze Beschreibung des Kurses."
+        }
+      },
+      "details": {
+        "instructors": "Example Teacher",
+        "room": "Room 1"
+      },
+      "registration": {
+        "registered": false,
+        "email": "teacher@example.org"
+      },
+      "calendar": {
+        "events": [],
+        "recurrence": {
+          "frequency": "weekly",
+          "interval_weeks": 1,
+          "weekday": "Monday",
+          "start_date": "2027-04-05",
+          "end_date": "2027-07-12",
+          "time": {
+            "start": "10:00",
+            "end": "13:00"
+          }
+        },
+        "semester_break_excluded": ["2027-05-24"]
+      }
+    }
+  ]
+}

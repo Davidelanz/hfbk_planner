@@ -1,0 +1,119 @@
+/* Shared controls: buttons, filters, saved lists, tabs, and status chips. */
+.btnrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.btn {
+  border: 1px solid var(--ink);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 0;
+  padding: 9px 14px;
+  font-weight: 750;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  &.dark {
+    background: var(--ink);
+    color: #fff;
+    border-color: #fff;
+  }
+
+  &.yellow {
+    background: var(--accent);
+  }
+}
+.savebox {
+  display: flex;
+  gap: 7px;
+
+  input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    border-radius: 0;
+    padding: 9px 0;
+  }
+}
+.saved {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+.saved-item {
+  display: flex;
+  gap: 7px;
+
+  button:first-child {
+    flex: 1;
+    text-align: left;
+  }
+}
+.mini {
+  border: 1px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 0;
+  padding: 7px 9px;
+}
+.content {
+  min-width: 0;
+}
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.count {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.legend {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.legend span,
+.type-chip,
+.badge {
+  font-size: 0.73rem;
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  border-radius: 0;
+  padding: 5px 9px;
+}
+.legend span {
+  border-left: 7px solid var(--legend);
+  background: #f4f4f4;
+}
+.viewtabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+
+  .active {
+    background: var(--ink);
+    color: #fff;
+  }
+}
+.panel {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}

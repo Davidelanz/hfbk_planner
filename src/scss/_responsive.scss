@@ -1,0 +1,42 @@
+/* Responsive overrides for stacked layouts and compact course cards. */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+    padding-right: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .lang + .lang {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .cal-grid {
+    min-width: 800px;
+  }
+  .calendar-wrap {
+    overflow-x: auto;
+  }
+}
+@media (max-width: 560px) {
+  .shell {
+    padding: 12px;
+  }
+  .lecture-body,
+  summary {
+    padding: 15px;
+  }
+  .sum-title {
+    font-size: 1rem;
+  }
+}

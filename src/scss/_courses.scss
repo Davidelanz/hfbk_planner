@@ -1,0 +1,152 @@
+/* Course catalogue: collapsible cards, bilingual columns, and metadata. */
+.lecture-list {
+  display: grid;
+  gap: 12px;
+}
+.lecture {
+  --type: #777;
+  background: var(--panel);
+  border: 0;
+  border-top: 1px solid var(--ink);
+  border-left: 8px solid var(--type);
+  border-radius: var(--radius);
+  box-shadow: none;
+  overflow: hidden;
+
+  &[open] {
+    .chev {
+      background: var(--ink);
+      color: #fff;
+    }
+  }
+
+  &.excluded {
+    opacity: 0.48;
+    filter: grayscale(0.6);
+  }
+}
+.lecture > summary {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 18px 20px;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+.sum-title {
+  font-size: 1.14rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+.sum-meta {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.chev {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+.lecture-body {
+  border-top: 1px solid var(--line);
+  padding: 18px 20px 22px;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  overflow: hidden;
+}
+.lang {
+  padding: 18px;
+
+  & + & {
+    border-left: 1px solid var(--line);
+  }
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+  }
+
+  p {
+    white-space: pre-line;
+    margin: 0.65rem 0;
+  }
+}
+.badge {
+  display: inline-flex;
+  background: #e8eaff;
+  color: #273ab3;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.facts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.fact {
+  padding: 7px 10px;
+  border-radius: 0;
+  background: #f2f2f2;
+  font-size: 0.85rem;
+}
+.needs {
+  background: #fff0c8;
+  color: #765200;
+}
+.empty {
+  padding: 50px 20px;
+  text-align: center;
+  border: 2px dashed var(--line);
+  border-radius: 0;
+}
+
+.sum-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.plan-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+
+  input {
+    accent-color: var(--ink);
+  }
+}
+
+/* Keeps the technical JSON example optional and visually secondary. */
+.schema-help {
+  border-top: 1px solid var(--ink);
+  margin-top: 20px;
+
+  > summary {
+    display: block;
+    padding: 12px 0;
+    font-weight: 800;
+  }
+}
