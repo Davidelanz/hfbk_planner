@@ -164,11 +164,10 @@
             ><button class="btn" data-view="month">Month</button
             ><button class="btn" data-view="week">Week</button
             ><button class="btn" data-view="conflicts">Conflicts</button
-            ><button class="btn" data-view="questions">Needs your input</button
+            ><button class="btn" data-view="questions" hidden>
+              Needs your input</button
             ><button class="btn" data-view="addCourse">Add course</button
-            ><button class="btn" data-view="dataGuide">
-              How to manage data
-            </button>
+            ><button class="btn" data-view="dataGuide">Getting started</button>
           </nav>
           <div id="courses" class="panel active">
             <div id="lectureList" class="lecture-list"></div>
@@ -416,72 +415,149 @@
           </div>
           <div id="dataGuide" class="panel">
             <div class="questions uploadbox">
-              <h2>Use your own course file</h2>
-              <p class="data-start-guidance">
-                To load an existing catalogue, choose your JSON data file below.
-                If you do not have one, use the <strong>Add course</strong> tab
-                to create courses with the guided form—no JSON editing is
-                needed.
-              </p>
+              <h2>Getting started</h2>
               <p>
-                JSON is a plain-text file that keeps information in labelled
-                boxes for course names, texts, dates, and rooms. You do not need
-                to program. Keep the structure below, replace the example
-                information, save it as <code>data.json</code>, and choose it
-                here.
+                This planner keeps all courses in one small data file on your
+                computer. You do not need to understand or edit the file
+                yourself.
               </p>
-              <p class="field-warning" role="alert">
-                Warning: uploaded, added, and edited courses stay in this
-                browser session only. Export and save the current JSON before
-                closing the session or reloading the page to keep your changes.
-              </p>
+              <section id="linkedFileMode" hidden>
+                <h3>Choose where to keep your data</h3>
+                <p>
+                  Start a new file or connect one that your group already uses.
+                  The planner saves course edits, deletions, additions, "In
+                  plan", and "Registered" changes to the selected file. The file
+                  stays on your computer and is never uploaded by this website.
+                </p>
+                <div class="data-actions">
+                  <div class="data-action">
+                    <button id="connectJson" class="btn dark" type="button">
+                      Upload your file
+                    </button>
+                    <small>Open a course file that already exists.</small>
+                  </div>
+                  <div id="disconnectRow" class="data-action" hidden>
+                    <button id="disconnectJson" class="btn" type="button">
+                      Disconnect file
+                    </button>
+                    <small>Stop saving changes to the connected file.</small>
+                  </div>
+                  <div class="data-action">
+                    <button id="createJson" class="btn danger" type="button">
+                      Start with a new empty file
+                    </button>
+                    <small>Create a new file and begin adding courses.</small>
+                  </div>
+                </div>
+                <span id="localFileStatus" class="status" role="status"></span>
+                <p class="field-help">
+                  Your browser will ask for permission before this site reads or
+                  writes the selected file.
+                </p>
+              </section>
+              <section id="manualFileMode" hidden>
+                <h3>Choose where to keep your data</h3>
+                <p>
+                  Start a new schedule or import a data file that your group
+                  already uses. Export the data file after making changes so you
+                  can open the updated version next time.
+                </p>
+                <div class="data-actions">
+                  <div class="data-action">
+                    <label for="jsonUpload" class="btn dark file-upload-button">
+                      Upload your file
+                    </label>
+                    <input
+                      id="jsonUpload"
+                      class="file-input"
+                      type="file"
+                      accept=".json,application/json"
+                    />
+                    <small>
+                      Open an existing course file.
+                      <span id="selectedFileName">No file selected.</span>
+                    </small>
+                  </div>
+                  <div class="data-action">
+                    <button id="downloadJson" class="btn" type="button">
+                      Save your file
+                    </button>
+                    <small
+                      >Download a copy containing your latest changes.</small
+                    >
+                  </div>
+                  <div class="data-action">
+                    <button
+                      id="downloadBlankJson"
+                      class="btn danger"
+                      type="button"
+                    >
+                      Start with a new empty file
+                    </button>
+                    <small
+                      >Clear the current schedule and begin adding
+                      courses.</small
+                    >
+                  </div>
+                </div>
+                <p id="jsonStatus" class="status" role="status"></p>
+              </section>
+              <h3>How to add or correct courses</h3>
+              <ol class="guide-steps">
+                <li>Open the <strong>Add course</strong> tab.</li>
+                <li>
+                  Fill in the information you know. You can leave optional
+                  details empty and return to them later.
+                </li>
+                <li>
+                  Use <strong>Edit course</strong>, <strong>Duplicate</strong>,
+                  or <strong>Delete</strong> on a course whenever the shared
+                  information changes.
+                </li>
+              </ol>
+              <h3>Why students need to make this file</h3>
               <p>
-                The file is read only in your browser. It is not uploaded or
-                published. Export first if you want to keep changes to “In plan”
-                or “Registered”.
+                HFBK currently does not provide official structured data for the
+                complete course schedule. For now, each student or group of
+                students has to compile and maintain a shared course file.
+                Students should also request that HFBK publish official schedule
+                data in this format. If HFBK supports it in the future, nobody
+                will need to enter all the courses by hand anymore.
               </p>
-              <div class="upload-actions">
-                <label for="jsonUpload"
-                  ><strong>Choose your JSON data file</strong></label
-                >
-                <input
-                  id="jsonUpload"
-                  type="file"
-                  accept=".json,application/json"
-                /><button id="downloadJson" class="btn">
-                  Export current JSON
-                </button>
-              </div>
-              <p id="jsonStatus" class="status" role="status"></p>
-              <div class="schema-help">
-                Example of how an entry is stored in the JSON format:
-                <pre class="schema-example">
-{
+              <h3>If you like JSON magic</h3>
+              <p>
+                You can create or update many courses at once in a text editor.
+                Keep <code>schema_version</code> set to <code>1</code> and place
+                every course inside the <code>courses</code> list. Each course
+                needs a unique <code>id</code>. Copy a complete course object to
+                add another one, separate objects with commas, and keep dates in
+                <code>YYYY-MM-DD</code> format.
+              </p>
+              <pre class="json-example"><code>{
   "schema_version": 1,
   "courses": [{
-    "id": "unique-id",
+    "id": "film-seminar-01",
     "plan": true,
-    "classification": {"subject": "Film", "type": "Seminar"},
-    "text": {"en": {"title": "...", "body": "..."}, "de": {"title": "...", "body": "..."}},
-    "details": {"instructors": "...", "room": "..."},
-    "registration": {"registered": false, "email": "name@example.org"},
-    "calendar": {"events": [["2026-10-15", "10:00", "13:00"]]},
+    "classification": {
+      "subject": "Film",
+      "type": "Seminar"
+    },
+    "text": {
+      "en": {"title": "Course title", "body": "Description"},
+      "de": {"title": "Kurstitel", "body": "Beschreibung"}
+    },
+    "details": {"instructors": "Name", "room": "Room 1"},
+    "registration": {"registered": false, "email": ""},
+    "calendar": {
+      "events": [["2026-10-15", "10:00", "13:00"]]
+    },
     "source": {"pdf_page": 10}
   }]
-}</pre>
-              </div>
-              <p>
-                Repeating courses may add <code>calendar.recurrence</code> and
-                <code>semester_break_excluded</code>. The app checks course data
-                automatically and does not require a diagnostics field in the
-                JSON.
-              </p>
-              <p>
-                Check
-                <a href="https://www.reddit.com/r/Scriptable/s/qPr9AuDgeV"
-                  >A Beginner's Guide to JSON</a
-                >
-                if you are a bit lost.
+}</code></pre>
+              <p class="field-help">
+                Optional values may be empty. After editing, upload the file
+                again. The planner will report missing required fields or
+                duplicate IDs.
               </p>
             </div>
           </div>

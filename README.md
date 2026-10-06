@@ -16,7 +16,7 @@ This is an independent project and is not an official HFBK service.
 - Guided course entry with exact or repeating dates, including break dates
 - Course editing from the overview
 - Automatic checks for missing or malformed course information
-- JSON import and export
+- Local data-file creation, connection, autosave, import, and export
 
 Subjects use the eight official HFBK study focuses plus **Other**. Course types use a short list of teaching formats so filters stay consistent.
 
@@ -51,11 +51,9 @@ Open <http://localhost:4173>. Press `Ctrl+C` to stop the server and return to th
 
 Copy [data.example.json](data.example.json) to `data/data.json`, then replace the example course with your own entries. The `data/` directory is ignored by Git.
 
-You can also open **How to manage data** in the app and choose a JSON file. A JSON file is a text document with labelled fields for information such as titles, dates, rooms, and teachers.
+You can also open **Getting started** in the app. In browsers with local-file access, create or connect a data file and let the planner save changes to it automatically. The app detects this capability at runtime.
 
-Imported data, added courses, and edits stay in the current browser session. Plan and registration choices are stored in local browser storage. Export the JSON if you want to keep those changes in a file.
-
-Export and save the current JSON before closing the session or reloading the page to preserve added courses, edits, and plan or registration changes.
+If direct file access is unavailable, the same screen provides blank-file download, import, and export controls. Plan and registration choices are also stored in local browser storage.
 
 ## Build
 

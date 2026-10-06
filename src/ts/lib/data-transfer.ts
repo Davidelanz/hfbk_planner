@@ -36,6 +36,23 @@ export function downloadCatalog(
   included: Set<string>,
   registered: Set<string>,
 ): void {
+  const blob = new Blob([catalogJson(courses, included, registered)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "data.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Serializes current course data and user choices for saving. */
+export function catalogJson(
+  courses: Course[],
+  included: Set<string>,
+  registered: Set<string>,
+): string {
   const output = structuredClone(courses);
   output.forEach((course) => {
     course.plan = included.has(course.id);
@@ -43,16 +60,5 @@ export function downloadCatalog(
     course.registration.registered = registered.has(course.id);
   });
 
-  const blob = new Blob(
-    [JSON.stringify({ schema_version: 1, courses: output }, null, 2) + "\n"],
-    {
-      type: "application/json",
-    },
-  );
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "data.json";
-  link.click();
-  URL.revokeObjectURL(url);
+  return JSON.stringify({ schema_version: 1, courses: output }, null, 2) + "\n";
 }

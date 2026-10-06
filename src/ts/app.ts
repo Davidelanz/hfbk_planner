@@ -11,13 +11,27 @@ import { monthCalendar } from "./components/month-calendar";
 import { conflictsPanel, questionsPanel } from "./components/panels";
 import { weekCalendar } from "./components/week-calendar";
 import { loadCatalog } from "./lib/catalog";
-import { validatePayload, downloadCatalog } from "./lib/data-transfer";
+import {
+  catalogJson,
+  validatePayload,
+  downloadCatalog,
+} from "./lib/data-transfer";
 import { addDays } from "./lib/dates";
 import { $, $$, escapeHtml as esc } from "./lib/dom";
 import { FOCUS_COLORS, focus } from "./lib/focus";
 import { PlannerState } from "./lib/state";
 import type { StatusFilter } from "./lib/state";
 import { readStored, writeStored } from "./lib/storage";
+import {
+  chooseLocalCatalog,
+  createLocalCatalog,
+  forgetLocalCatalog,
+  readLocalCatalog,
+  rememberedLocalCatalog,
+  supportsLocalCatalogLink,
+  writeLocalCatalog,
+} from "./lib/local-catalog-file";
+import type { LocalCatalogHandle } from "./lib/local-catalog-file";
 
 interface SavedList {
   name: string;
@@ -35,6 +49,29 @@ const payload = await loadCatalog();
 const state = new PlannerState(payload.courses);
 let editingCourseId: string | null = null;
 let courseSort: CourseSort = "subject";
+let linkedCatalog: LocalCatalogHandle | null = null;
+let localSaveQueue = Promise.resolve();
+
+/** Queues a complete snapshot so rapid edits cannot overwrite newer data. */
+function autosaveLinkedCatalog(): void {
+  if (!linkedCatalog) return;
+  const handle = linkedCatalog;
+  const snapshot = catalogJson(state.courses, state.included, state.registered);
+  $("#localFileStatus").textContent = `Saving to ${handle.name}...`;
+  localSaveQueue = localSaveQueue
+    .catch(() => undefined)
+    .then(() => writeLocalCatalog(handle, snapshot))
+    .then(() => {
+      if (linkedCatalog === handle) {
+        $("#localFileStatus").textContent =
+          `Saved automatically to ${handle.name}.`;
+      }
+    })
+    .catch((error) => {
+      $("#localFileStatus").textContent =
+        `Autosave failed: ${(error as Error).message}`;
+    });
+}
 
 /** Renders every view from current state. */
 function render(): void {
@@ -109,7 +146,7 @@ function renderCourses(): void {
   $("#count").textContent = `${included} in plan · ${courses.length} courses`;
   const emptyMessage = state.lectures.length
     ? '<div class="empty"><h2>No matching courses</h2><p>Change or reset the filters to see courses again.</p></div>'
-    : `<div class="empty"><h2>No course data yet</h2><p>Upload your JSON data file in the <strong>How to manage data</strong> tab, or create your first course in the <strong>Add course</strong> tab.</p><div class="empty-actions"><button class="btn dark" type="button" data-open-view="dataGuide">Upload JSON data</button><button class="btn" type="button" data-open-view="addCourse">Add a course</button></div></div>`;
+    : `<div class="empty"><h2>No course data yet</h2><p>Open <strong>Getting started</strong> to create or connect a data file, or create your first course in the <strong>Add course</strong> tab.</p><div class="empty-actions"><button class="btn dark" type="button" data-open-view="dataGuide">Getting started</button><button class="btn" type="button" data-open-view="addCourse">Add a course</button></div></div>`;
   $("#lectureList").innerHTML = courses.length
     ? courses
         .map((course) =>
@@ -190,7 +227,14 @@ function renderWeek(): void {
 
 /** Renders conflict and missing-information panels. */
 function renderPanels(): void {
-  $("#questionList").innerHTML = questionsPanel(state.filtered());
+  const filtered = state.filtered();
+  const hasQuestions = filtered.some((course) => course.input_issues.length);
+  const questionsButton = $<HTMLButtonElement>('[data-view="questions"]');
+  questionsButton.hidden = !hasQuestions;
+  if (!hasQuestions && $("#questions").classList.contains("active")) {
+    openView("courses");
+  }
+  $("#questionList").innerHTML = questionsPanel(filtered);
   $("#conflictList").innerHTML = conflictsPanel(state.planned());
 }
 
@@ -269,12 +313,14 @@ document.addEventListener("change", (event) => {
     if (target.checked) state.included.add(target.dataset.courseToggle);
     else state.included.delete(target.dataset.courseToggle);
     state.saveChoices();
+    autosaveLinkedCatalog();
     render();
   }
   if (target.dataset.courseRegistered) {
     if (target.checked) state.registered.add(target.dataset.courseRegistered);
     else state.registered.delete(target.dataset.courseRegistered);
     state.saveChoices();
+    autosaveLinkedCatalog();
     render();
   }
 });
@@ -314,8 +360,9 @@ document.addEventListener("click", (event) => {
     const course = state.lectures.find((item) => item.id === id);
     if (!course) return;
     const title = course.title_en || course.title_de || "this course";
-    if (!window.confirm(`Delete “${title}”? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
     state.deleteCourse(id);
+    autosaveLinkedCatalog();
     if (editingCourseId === id) {
       editingCourseId = null;
       courseForm.reset();
@@ -340,11 +387,13 @@ $<HTMLInputElement>("#search").addEventListener("input", (event) => {
 $("#includeAll").onclick = () => {
   state.filtered().forEach((course) => state.included.add(course.id));
   state.saveChoices();
+  autosaveLinkedCatalog();
   render();
 };
 $("#excludeAll").onclick = () => {
   state.filtered().forEach((course) => state.included.delete(course.id));
   state.saveChoices();
+  autosaveLinkedCatalog();
   render();
 };
 $("#expandAll").onclick = () =>
@@ -357,6 +406,7 @@ $<HTMLSelectElement>("#courseSort").addEventListener("change", (event) => {
 });
 $("#reset").onclick = () => {
   state.reset();
+  autosaveLinkedCatalog();
   $("#search").value = "";
   render();
 };
@@ -426,21 +476,120 @@ $<HTMLDivElement>("#savedLists").onclick = (event) => {
   state.included = new Set(list.included);
   state.registered = new Set(list.registered);
   state.saveChoices();
+  autosaveLinkedCatalog();
   $("#search").value = state.query;
   render();
 };
 
 $("#downloadJson").onclick = () =>
   downloadCatalog(state.courses, state.included, state.registered);
+$<HTMLButtonElement>("#downloadBlankJson").onclick = () =>
+  startBlankImportedCatalog();
+
+function startBlankImportedCatalog(): void {
+  if (
+    state.courses.length &&
+    !window.confirm(
+      "Start a new schedule? Unsaved changes in the current schedule will be cleared.",
+    )
+  ) {
+    return;
+  }
+  state.replaceCourses([]);
+  $("#search").value = "";
+  $("#jsonStatus").textContent =
+    "New schedule started. Export the data file when you want to save it.";
+  render();
+  openView("addCourse");
+}
+
+function showLinkedCatalog(handle: LocalCatalogHandle): void {
+  linkedCatalog = handle;
+  $("#localFileStatus").textContent =
+    `Connected to ${handle.name}. Changes save automatically.`;
+  $("#disconnectRow").hidden = false;
+}
+
+async function loadLinkedCatalog(
+  handle: LocalCatalogHandle,
+  requestPermission: boolean,
+): Promise<void> {
+  const permission = requestPermission
+    ? await handle.requestPermission({ mode: "readwrite" })
+    : await handle.queryPermission({ mode: "readwrite" });
+  if (permission !== "granted") {
+    linkedCatalog = handle;
+    $("#localFileStatus").textContent =
+      `Reconnect ${handle.name} to continue loading and autosaving.`;
+    $("#disconnectRow").hidden = false;
+    return;
+  }
+  state.replaceCourses(await readLocalCatalog(handle));
+  $("#search").value = "";
+  showLinkedCatalog(handle);
+  render();
+  openView("courses");
+}
+
+$<HTMLButtonElement>("#connectJson").onclick = async () => {
+  try {
+    if (linkedCatalog) {
+      await loadLinkedCatalog(linkedCatalog, true);
+    } else {
+      await loadLinkedCatalog(await chooseLocalCatalog(), true);
+    }
+  } catch (error) {
+    if ((error as DOMException).name === "AbortError") return;
+    $("#localFileStatus").textContent =
+      `Could not connect the file: ${(error as Error).message}`;
+  }
+};
+
+$<HTMLButtonElement>("#createJson").onclick = async () => {
+  try {
+    const handle = await createLocalCatalog();
+    const permission = await handle.requestPermission({ mode: "readwrite" });
+    if (permission !== "granted") {
+      throw new Error("Permission to save the file was not granted.");
+    }
+    state.replaceCourses([]);
+    await writeLocalCatalog(
+      handle,
+      catalogJson(state.courses, state.included, state.registered),
+    );
+    showLinkedCatalog(handle);
+    $("#search").value = "";
+    render();
+    openView("addCourse");
+  } catch (error) {
+    if ((error as DOMException).name === "AbortError") return;
+    $("#localFileStatus").textContent =
+      `Could not create the file: ${(error as Error).message}`;
+  }
+};
+
+$<HTMLButtonElement>("#disconnectJson").onclick = async () => {
+  await forgetLocalCatalog();
+  linkedCatalog = null;
+  localSaveQueue = Promise.resolve();
+  $("#localFileStatus").textContent =
+    "Disconnected. The file was not changed or deleted.";
+  $("#disconnectRow").hidden = true;
+};
+
 $<HTMLInputElement>("#jsonUpload").addEventListener("change", async (event) => {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
+  $("#selectedFileName").textContent = file.name;
   try {
     state.replaceCourses(validatePayload(JSON.parse(await file.text())));
     $("#jsonStatus").textContent =
       `Loaded ${state.lectures.length} courses. Nothing was uploaded online.`;
     $("#search").value = "";
+    linkedCatalog = null;
+    await forgetLocalCatalog();
+    $("#disconnectRow").hidden = true;
     render();
     openView("courses");
   } catch (error) {
@@ -512,6 +661,7 @@ courseForm.addEventListener("submit", (event) => {
     const course = courseFromForm(courseForm, existingCourse);
     if (isEditing) state.updateCourse(course);
     else state.addCourse(course);
+    autosaveLinkedCatalog();
     state.subjects.clear();
     state.types.clear();
     state.query = "";
@@ -536,3 +686,17 @@ resetEventRows();
 syncDateModeUI();
 render();
 if (!state.lectures.length) openView("dataGuide");
+
+if (!supportsLocalCatalogLink()) {
+  $("#manualFileMode").hidden = false;
+} else {
+  $("#linkedFileMode").hidden = false;
+  void rememberedLocalCatalog()
+    .then((handle) => {
+      if (handle) return loadLinkedCatalog(handle, false);
+    })
+    .catch((error) => {
+      $("#localFileStatus").textContent =
+        `Could not restore the file link: ${(error as Error).message}`;
+    });
+}
