@@ -11,7 +11,11 @@ This is an independent project and is not an official HFBK service.
 - Monthly and hourly weekly calendars
 - Subject colours, saved filters, plan status, and registration status
 - Conflict ranking for selected courses
+- Guided course entry with exact or repeating dates, including break dates
+- Course editing from the overview
 - JSON import and export
+
+Subjects use the eight official HFBK study focuses plus **Other**. Course types use a short list of teaching formats so filters stay consistent.
 
 ## Open a Node session
 
@@ -44,9 +48,11 @@ Open <http://localhost:4173>. Press `Ctrl+C` to stop the server and return to th
 
 Copy [data.example.json](data.example.json) to `data/data.json`, then replace the example course with your own entries. The `data/` directory is ignored by Git.
 
-You can also open **How to upload data** in the app and choose a JSON file. A JSON file is a text document with labelled fields for information such as titles, dates, rooms, and teachers.
+You can also open **How to manage data** in the app and choose a JSON file. A JSON file is a text document with labelled fields for information such as titles, dates, rooms, and teachers.
 
-Imported data stays in the current browser session. Plan and registration choices are stored in local browser storage. Export the JSON if you want to keep those changes in a file.
+Imported data, added courses, and edits stay in the current browser session. Plan and registration choices are stored in local browser storage. Export the JSON if you want to keep those changes in a file.
+
+Export and save the current JSON before closing the session or reloading the page to preserve added courses, edits, and plan or registration changes.
 
 ## Build
 

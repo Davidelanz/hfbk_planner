@@ -101,6 +101,9 @@
   flex-wrap: wrap;
   margin-top: 14px;
 }
+.course-edit-action {
+  margin-top: 16px;
+}
 .fact {
   padding: 7px 10px;
   border-radius: 0;
@@ -141,8 +144,8 @@
 
 /* Keeps the technical JSON example optional and visually secondary. */
 .schema-help {
-  border-top: 1px solid var(--ink);
-  margin-top: 20px;
+  margin-top: 6px;
+  overflow: auto;
 
   > summary {
     display: block;

@@ -79,6 +79,29 @@ export class PlannerState {
     this.saveChoices();
   }
 
+  /** Adds one course without discarding existing user choices. */
+  addCourse(course: Course): void {
+    this.courses.push(course);
+    this.lectures = hydrate(this.courses);
+    if (course.plan) this.included.add(course.id);
+    if (course.registration.registered) this.registered.add(course.id);
+    this.saveChoices();
+  }
+
+  /** Replaces one course while preserving the other catalogue entries. */
+  updateCourse(course: Course): void {
+    const index = this.courses.findIndex((item) => item.id === course.id);
+    if (index < 0) throw new Error(`Course ${course.id} no longer exists.`);
+
+    this.courses[index] = course;
+    this.lectures = hydrate(this.courses);
+    if (course.plan) this.included.add(course.id);
+    else this.included.delete(course.id);
+    if (course.registration.registered) this.registered.add(course.id);
+    else this.registered.delete(course.id);
+    this.saveChoices();
+  }
+
   /** Persists plan and registration choices. */
   saveChoices(): void {
     writeStored(PLAN_KEY, [...this.included]);

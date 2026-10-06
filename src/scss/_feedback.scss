@@ -61,6 +61,23 @@
   input {
     max-width: 100%;
   }
+
+  input[type="file"]::file-selector-button {
+    border: 1px solid var(--ink);
+    background: #fff;
+    color: var(--ink);
+    padding: 9px 14px;
+    margin-right: 10px;
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--ink);
+      color: #fff;
+    }
+  }
 }
 .schema-example {
   overflow: auto;

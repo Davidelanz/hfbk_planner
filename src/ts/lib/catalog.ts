@@ -1,4 +1,9 @@
 import type { Course, CoursePayload, Lecture } from "./types";
+import {
+  normalizeCourseTaxonomy,
+  normalizeCourseType,
+  normalizeSubject,
+} from "./taxonomy";
 
 /** Builds the compact schedule shown on collapsed cards. */
 function scheduleLabel(course: Course): string {
@@ -7,8 +12,15 @@ function scheduleLabel(course: Course): string {
     const start = recurrence.time?.start;
     const end = recurrence.time?.end;
     const time = start ? (end ? `${start}-${end}` : `${start}-?`) : "Time TBA";
+    const interval =
+      recurrence.interval_weeks ||
+      (recurrence.frequency === "biweekly" ? 2 : 1);
     const frequency =
-      recurrence.frequency === "biweekly" ? "Every other week" : "Weekly";
+      interval === 1
+        ? "Weekly"
+        : interval === 2
+          ? "Every other week"
+          : `Every ${interval} weeks`;
     return `${frequency} · ${recurrence.weekday} · ${time}`;
   }
   const events = course.calendar.events;
@@ -25,8 +37,8 @@ export function hydrate(data: Course[]): Lecture[] {
     return {
       id: course.id,
       page: course.source?.pdf_page,
-      subject: course.classification?.subject || "Other",
-      type: course.classification?.type || "Course",
+      subject: normalizeSubject(course.classification?.subject || ""),
+      type: normalizeCourseType(course.classification?.type || ""),
       title_en: course.text?.en?.title || "",
       body_en: course.text?.en?.body || "",
       title_de: course.text?.de?.title || "",
@@ -65,5 +77,11 @@ export async function loadCatalog(url = "./data.json"): Promise<CoursePayload> {
     return { schema_version: 1, courses: [] };
   }
   const value = await response.json();
-  return Array.isArray(value) ? { schema_version: 1, courses: value } : value;
+  const payload = Array.isArray(value)
+    ? { schema_version: 1, courses: value }
+    : value;
+  return {
+    ...payload,
+    courses: payload.courses.map(normalizeCourseTaxonomy),
+  };
 }

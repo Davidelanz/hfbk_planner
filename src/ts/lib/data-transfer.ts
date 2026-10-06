@@ -1,4 +1,5 @@
 import type { Course, CoursePayload } from "./types";
+import { normalizeCourseTaxonomy } from "./taxonomy";
 
 /** Validates the minimum portable catalogue contract. */
 export function validatePayload(value: unknown): Course[] {
@@ -32,7 +33,7 @@ export function validatePayload(value: unknown): Course[] {
       );
     }
   });
-  return courses;
+  return courses.map(normalizeCourseTaxonomy);
 }
 
 /** Downloads catalogue data with current user choices. */

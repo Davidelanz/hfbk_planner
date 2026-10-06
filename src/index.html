@@ -11,7 +11,7 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2317191f'/%3E%3Cpath d='M15 18h34v28H15z' fill='none' stroke='%23ffcf4a' stroke-width='5'/%3E%3Cpath d='M27 18v28' stroke='%23ffcf4a' stroke-width='5'/%3E%3C/svg%3E"
+      href="https://hfbk-hamburg.de/favicon/favicon.svg"
     />
     <link rel="stylesheet" href="/scss/main.scss" />
   </head>
@@ -91,6 +91,15 @@
           <div class="toolbar">
             <div class="count" id="count"></div>
             <div class="btnrow">
+              <label class="sort-control">
+                Sort by
+                <select id="courseSort" aria-label="Sort courses">
+                  <option value="subject">Subject / type / alphabetic</option>
+                  <option value="start-date">Start date</option>
+                  <option value="type">Type / alphabetic</option>
+                  <option value="teacher">Teacher (alphabetical)</option>
+                </select>
+              </label>
               <button id="expandAll" class="btn">Expand all</button
               ><button id="collapseAll" class="btn">Collapse all</button>
             </div>
@@ -106,8 +115,9 @@
             ><button class="btn" data-view="week">Week</button
             ><button class="btn" data-view="conflicts">Conflicts</button
             ><button class="btn" data-view="questions">Needs your input</button
+            ><button class="btn" data-view="addCourse">Add course</button
             ><button class="btn" data-view="dataGuide">
-              How to upload data
+              How to manage data
             </button>
           </nav>
           <div id="courses" class="panel active">
@@ -161,6 +171,179 @@
               <div id="questionList"></div>
             </div>
           </div>
+          <div id="addCourse" class="panel">
+            <form id="courseForm" class="course-form">
+              <header class="form-intro">
+                <h2 id="courseFormTitle">Add a course</h2>
+                <p>
+                  Add the information you know. Empty optional fields are listed
+                  under Needs your input after saving.
+                </p>
+                <p class="field-warning" role="alert">
+                  Warning: added or edited courses stay in this browser session
+                  only. Export and save the current JSON before closing the
+                  session or reloading the page to keep your changes.
+                </p>
+              </header>
+
+              <fieldset>
+                <legend>Course</legend>
+                <div class="form-grid">
+                  <label
+                    >English title
+                    <input name="title-en" required autocomplete="off"
+                  /></label>
+                  <label
+                    >German title <input name="title-de" autocomplete="off"
+                  /></label>
+                  <label
+                    >Subject
+                    <select id="courseSubject" name="subject" required></select
+                  ></label>
+                  <label
+                    >Course type
+                    <select id="courseType" name="type" required></select
+                  ></label>
+                  <label
+                    >Teacher or teachers
+                    <input name="instructors" autocomplete="off"
+                  /></label>
+                  <label>Room <input name="room" autocomplete="off" /></label>
+                </div>
+                <div class="form-grid text-grid">
+                  <label
+                    >English description
+                    <textarea name="body-en" rows="7"></textarea>
+                  </label>
+                  <label
+                    >German description
+                    <textarea name="body-de" rows="7"></textarea>
+                  </label>
+                </div>
+                <label class="short-field"
+                  >Machine-translated text
+                  <select name="machine-translation">
+                    <option value="">None</option>
+                    <option value="en">English</option>
+                    <option value="de">German</option>
+                  </select>
+                </label>
+              </fieldset>
+
+              <fieldset>
+                <legend>Dates</legend>
+                <p class="field-help">
+                  Choose exact dates to add sessions individually, or repeating
+                  dates to generate sessions between the start and end dates.
+                  Break dates are excluded from the repeating schedule.
+                </p>
+                <div class="form-checks">
+                  <label
+                    ><input
+                      type="radio"
+                      name="date-mode"
+                      value="exact"
+                      checked
+                    />
+                    Exact dates</label
+                  >
+                  <label
+                    ><input type="radio" name="date-mode" value="repeating" />
+                    Repeating dates</label
+                  >
+                </div>
+                <div id="exactDateFields">
+                  <div id="eventRows" class="event-rows"></div>
+                  <button id="addEventDate" class="btn" type="button">
+                    Add another date
+                  </button>
+                </div>
+                <div id="recurringDateFields" hidden>
+                  <div class="form-grid">
+                    <label>
+                      Start date
+                      <input type="date" name="recurrence-start-date" />
+                    </label>
+                    <label>
+                      End date
+                      <input type="date" name="recurrence-end-date" />
+                    </label>
+                    <label>
+                      Weekday
+                      <select name="recurrence-weekday">
+                        <option value="">Choose a weekday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                      </select>
+                    </label>
+                    <label>
+                      Start time
+                      <input type="time" name="recurrence-time-start" />
+                    </label>
+                    <label>
+                      End time
+                      <input type="time" name="recurrence-time-end" />
+                    </label>
+                    <label>
+                      Periodicity
+                      <select name="recurrence-interval-weeks">
+                        <option value="1">Weekly</option>
+                        <option value="2">Every other week</option>
+                        <option value="3">Every 3 weeks</option>
+                        <option value="4">Every 4 weeks</option>
+                      </select>
+                    </label>
+                    <label>
+                      Break dates
+                      <input
+                        type="text"
+                        name="recurrence-break-dates"
+                        placeholder="2026-11-27, 2026-12-18"
+                        autocomplete="off"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Registration</legend>
+                <div class="form-grid">
+                  <label
+                    >Registration email
+                    <input
+                      name="registration-email"
+                      type="email"
+                      autocomplete="email"
+                    />
+                  </label>
+                  <div class="form-checks">
+                    <label
+                      ><input name="plan" type="checkbox" checked /> In
+                      plan</label
+                    >
+                    <label
+                      ><input name="registered" type="checkbox" />
+                      Registered</label
+                    >
+                  </div>
+                </div>
+              </fieldset>
+
+              <div class="form-actions">
+                <button id="courseFormSubmit" class="btn dark" type="submit">
+                  Add course
+                </button>
+                <button class="btn" type="reset">Clear form</button>
+              </div>
+              <p id="courseFormStatus" class="status" role="status"></p>
+            </form>
+          </div>
           <div id="dataGuide" class="panel">
             <div class="questions uploadbox">
               <h2>Use your own course file</h2>
@@ -170,6 +353,11 @@
                 to program. Keep the structure below, replace the example
                 information, save it as <code>data.json</code>, and choose it
                 here.
+              </p>
+              <p class="field-warning" role="alert">
+                Warning: uploaded, added, and edited courses stay in this
+                browser session only. Export and save the current JSON before
+                closing the session or reloading the page to keep your changes.
               </p>
               <p>
                 The file is read only in your browser. It is not uploaded or
@@ -186,8 +374,8 @@
                 </button>
               </div>
               <p id="jsonStatus" class="status" role="status"></p>
-              <details class="schema-help">
-                <summary>Show the JSON structure</summary>
+              <div class="schema-help">
+                Example of how an entry is stored in the JSON format:
                 <pre class="schema-example">
 {
   "schema_version": 1,
@@ -202,11 +390,18 @@
     "source": {"pdf_page": 10}
   }]
 }</pre>
-              </details>
+              </div>
               <p>
                 Repeating courses may add <code>calendar.recurrence</code> and
                 <code>semester_break_excluded</code>. List missing fields in
                 <code>calendar.needs_input</code>.
+              </p>
+              <p>
+                Check
+                <a href="https://www.reddit.com/r/Scriptable/s/qPr9AuDgeV"
+                  >A Beginner's Guide to JSON</a
+                >
+                if you are a bit lost.
               </p>
             </div>
           </div>
