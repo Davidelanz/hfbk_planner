@@ -12,11 +12,15 @@ export function $$<T extends Element = any>(selector: string): T[] {
 
 /** Escapes text before HTML interpolation. */
 export function escapeHtml(value: unknown): string {
+  const entities: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
   return String(value ?? "").replace(
     /[&<>"']/g,
-    (character) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        character
-      ],
+    (character) => entities[character] ?? character,
   );
 }

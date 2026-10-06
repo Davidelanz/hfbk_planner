@@ -164,7 +164,7 @@ document.addEventListener("click", (event) => {
   card.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-$("#search").addEventListener("input", (event) => {
+$<HTMLInputElement>("#search").addEventListener("input", (event) => {
   state.query = (event.target as HTMLInputElement).value;
   renderCourses();
   renderPanels();
@@ -235,7 +235,7 @@ $("#saveList").onclick = () => {
   renderSavedLists();
 };
 
-$("#savedLists").onclick = (event) => {
+$<HTMLDivElement>("#savedLists").onclick = (event) => {
   const target = event.target as HTMLElement;
   const index = Number(target.dataset.load ?? target.dataset.delete);
   if (Number.isNaN(index)) return;
@@ -258,7 +258,7 @@ $("#savedLists").onclick = (event) => {
 
 $("#downloadJson").onclick = () =>
   downloadCatalog(state.courses, state.included, state.registered);
-$("#jsonUpload").addEventListener("change", async (event) => {
+$<HTMLInputElement>("#jsonUpload").addEventListener("change", async (event) => {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;

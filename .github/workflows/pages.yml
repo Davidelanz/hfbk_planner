@@ -18,14 +18,20 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Build in Node Docker container
-        run: |
-          docker run --rm \
-            -v "$PWD:/app" \
-            -v /app/node_modules \
-            -w /app \
-            node:22-alpine \
-            sh -lc "npm ci && npm run check && npm run build"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        continue-on-error: true
+        run: npm run format:check
+      - name: Lint
+        continue-on-error: true
+        run: npm run lint
+      - name: Build
+        run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

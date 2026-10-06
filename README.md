@@ -13,9 +13,9 @@ This is an independent project and is not an official HFBK service.
 - Conflict ranking for selected courses
 - JSON import and export
 
-## Start the development server
+## Open a Node session
 
-Docker is the only requirement.
+Docker is the only local requirement. Start an interactive Node container from the project directory:
 
 ```sh
 docker run --rm -it \
@@ -23,11 +23,22 @@ docker run --rm -it \
   -v "$PWD:/app" \
   -v /app/node_modules \
   -w /app \
-  node:22-alpine \
-  sh -lc "npm ci && npm run dev -- --port=4173"
+  node:22-alpine sh
 ```
 
-Open <http://localhost:4173>.
+Commands in the following sections run inside this container. Install the locked dependencies once:
+
+```sh
+npm ci
+```
+
+## Start the development server
+
+```sh
+npm run dev -- --port=4173
+```
+
+Open <http://localhost:4173>. Press `Ctrl+C` to stop the server and return to the container shell.
 
 ## Add course data
 
@@ -40,25 +51,24 @@ Imported data stays in the current browser session. Plan and registration choice
 ## Build
 
 ```sh
-./build.sh
+npm run build
 ```
 
-The static site is written to `dist/`. Production builds never include `data/data.json`. Visitors provide their own file through the upload view.
+This runs TypeScript first, then writes the static site to `dist/`. Production builds never include `data/data.json`. Visitors provide their own file through the upload view.
 
 ## Code quality
 
-The build script runs formatting checks, ESLint, TypeScript, and the production build. Run the checks without building with:
+Run formatting, ESLint, and TypeScript together with:
 
 ```sh
-docker run --rm -v "$PWD:/app" -v /app/node_modules -w /app node:22-alpine \
-  sh -lc "npm ci && npm run check"
+npm run check
 ```
 
-Format the source with the same container command, replacing `npm run check` with `npm run format`.
+Format the source with `npm run format`.
 
 ## Publishing
 
-The GitHub Pages workflow builds the static application and deploys `dist/`. It does not publish personal course data.
+The GitHub Pages workflow uses the standard Node action, installs dependencies once, builds the application, and deploys `dist/`. Formatting and linting are separate non-blocking warning steps. TypeScript errors and build failures block publication. The workflow does not publish personal course data.
 
 ## License
 
