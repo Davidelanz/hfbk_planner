@@ -91,6 +91,9 @@ function renderCourses(): void {
     state.included.has(course.id),
   ).length;
   $("#count").textContent = `${included} in plan · ${courses.length} courses`;
+  const emptyMessage = state.lectures.length
+    ? '<div class="empty"><h2>No matching courses</h2><p>Change or reset the filters to see courses again.</p></div>'
+    : `<div class="empty"><h2>No course data yet</h2><p>Upload your JSON data file in the <strong>How to manage data</strong> tab, or create your first course in the <strong>Add course</strong> tab.</p><div class="empty-actions"><button class="btn dark" type="button" data-open-view="dataGuide">Upload JSON data</button><button class="btn" type="button" data-open-view="addCourse">Add a course</button></div></div>`;
   $("#lectureList").innerHTML = courses.length
     ? courses
         .map((course) =>
@@ -101,7 +104,7 @@ function renderCourses(): void {
           ),
         )
         .join("")
-    : '<div class="empty"><h2>No matching courses</h2><p>Change the filters or load another JSON file.</p></div>';
+    : emptyMessage;
 }
 
 /** Sorts course cards by the selected overview order. */
@@ -203,6 +206,33 @@ function openView(view: string): void {
   );
 }
 
+/** Opens the guided form for editing or copying a course. */
+function openCourseForm(courseId: string, duplicate = false): void {
+  const course = state.courses.find((item) => item.id === courseId);
+  if (!course) {
+    $("#courseFormStatus").textContent = "This course is no longer available.";
+    return;
+  }
+  editingCourseId = duplicate ? null : course.id;
+  populateCourseForm(courseForm, course);
+  courseForm.querySelector<HTMLInputElement>('[name="plan"]')!.checked =
+    state.included.has(course.id);
+  courseForm.querySelector<HTMLInputElement>('[name="registered"]')!.checked =
+    state.registered.has(course.id);
+  $("#courseFormTitle").textContent = duplicate
+    ? "Duplicate course"
+    : "Edit course";
+  $("#courseFormSubmit").textContent = duplicate
+    ? "Add duplicate"
+    : "Save changes";
+  $("#courseFormStatus").textContent = duplicate
+    ? "Review the copied information, then add it as a new course."
+    : "";
+  syncDateModeUI();
+  openView("addCourse");
+  courseForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 /** Handles filters and course checkboxes. */
 document.addEventListener("change", (event) => {
   const target = event.target as HTMLInputElement;
@@ -231,30 +261,44 @@ document.addEventListener("change", (event) => {
 document.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
   if (target.closest(".plan-toggle")) event.stopPropagation();
+  const viewButton = target.closest<HTMLButtonElement>("[data-open-view]");
+  if (viewButton) {
+    openView(viewButton.dataset.openView!);
+    return;
+  }
   const editButton = target.closest<HTMLButtonElement>("[data-edit-course]");
   if (editButton) {
     event.preventDefault();
     event.stopPropagation();
-    const course = state.courses.find(
-      (item) => item.id === editButton.dataset.editCourse,
-    );
-    if (!course) {
-      $("#courseFormStatus").textContent =
-        "This course is no longer available to edit.";
-      return;
+    openCourseForm(editButton.dataset.editCourse!);
+    return;
+  }
+  const duplicateButton = target.closest<HTMLButtonElement>(
+    "[data-duplicate-course]",
+  );
+  if (duplicateButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    openCourseForm(duplicateButton.dataset.duplicateCourse!, true);
+    return;
+  }
+  const deleteButton = target.closest<HTMLButtonElement>(
+    "[data-delete-course]",
+  );
+  if (deleteButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    const id = deleteButton.dataset.deleteCourse!;
+    const course = state.lectures.find((item) => item.id === id);
+    if (!course) return;
+    const title = course.title_en || course.title_de || "this course";
+    if (!window.confirm(`Delete “${title}”? This cannot be undone.`)) return;
+    state.deleteCourse(id);
+    if (editingCourseId === id) {
+      editingCourseId = null;
+      courseForm.reset();
     }
-    editingCourseId = course.id;
-    populateCourseForm(courseForm, course);
-    courseForm.querySelector<HTMLInputElement>('[name="plan"]')!.checked =
-      state.included.has(course.id);
-    courseForm.querySelector<HTMLInputElement>('[name="registered"]')!.checked =
-      state.registered.has(course.id);
-    $("#courseFormTitle").textContent = "Edit course";
-    $("#courseFormSubmit").textContent = "Save changes";
-    $("#courseFormStatus").textContent = "";
-    syncDateModeUI();
-    openView("addCourse");
-    courseForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    render();
     return;
   }
   const courseLink = target.closest<HTMLAnchorElement>("[data-course-link]");

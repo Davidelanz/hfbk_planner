@@ -102,6 +102,18 @@ export class PlannerState {
     this.saveChoices();
   }
 
+  /** Deletes one course and removes its saved plan choices. */
+  deleteCourse(id: string): void {
+    const index = this.courses.findIndex((course) => course.id === id);
+    if (index < 0) throw new Error(`Course ${id} no longer exists.`);
+
+    this.courses.splice(index, 1);
+    this.lectures = hydrate(this.courses);
+    this.included.delete(id);
+    this.registered.delete(id);
+    this.saveChoices();
+  }
+
   /** Persists plan and registration choices. */
   saveChoices(): void {
     writeStored(PLAN_KEY, [...this.included]);

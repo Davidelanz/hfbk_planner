@@ -59,8 +59,10 @@ export function courseCard(
           <span class="type-chip" style="background:${color}18;color:${color}">${esc(focus(course))}</span>
           <span class="fact">${esc(course.type)}</span><span class="fact">${esc(dates)}</span>${facts}
         </div>
-        <div class="course-edit-action">
+        <div class="course-edit-actions">
           <button class="btn" type="button" data-edit-course="${esc(course.id)}">Edit course</button>
+          <button class="btn" type="button" data-duplicate-course="${esc(course.id)}">Duplicate</button>
+          <button class="btn danger" type="button" data-delete-course="${esc(course.id)}">Delete</button>
         </div>
       </div>
     </details>`;

@@ -56,6 +56,12 @@ export function populateCourseForm(
   setValue("type", stringValue(course.classification?.type));
   setValue("instructors", stringValue(course.details?.instructors));
   setValue("room", stringValue(course.details?.room));
+  setValue(
+    "source-page",
+    typeof course.source?.pdf_page === "number"
+      ? String(course.source.pdf_page)
+      : "",
+  );
   setValue("body-en", stringValue(englishText.body));
   setValue("body-de", stringValue(germanText.body));
   setValue(
@@ -135,6 +141,14 @@ export function courseFromForm(
   const titleDe = value("title-de");
   const bodyEn = value("body-en");
   const bodyDe = value("body-de");
+  const sourcePageText = value("source-page");
+  const sourcePage = sourcePageText ? Number(sourcePageText) : undefined;
+  if (
+    sourcePage !== undefined &&
+    (!Number.isInteger(sourcePage) || sourcePage < 1)
+  ) {
+    throw new Error("The source page must be a whole number greater than 0.");
+  }
   const dateMode =
     form.querySelector<HTMLInputElement>('input[name="date-mode"]:checked')
       ?.value ?? "exact";
@@ -180,7 +194,17 @@ export function courseFromForm(
       email: value("registration-email"),
     },
     calendar,
-    ...(existingCourse?.source ? { source: existingCourse.source } : {}),
+    ...(sourcePage !== undefined ||
+    existingCourse?.source?.user_confirmed_correction
+      ? {
+          source: {
+            ...(sourcePage !== undefined ? { pdf_page: sourcePage } : {}),
+            ...(existingCourse?.source?.user_confirmed_correction
+              ? { user_confirmed_correction: true }
+              : {}),
+          },
+        }
+      : {}),
   };
 }
 

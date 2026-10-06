@@ -240,6 +240,26 @@
                     <input name="instructors" autocomplete="off"
                   /></label>
                   <label>Room <input name="room" autocomplete="off" /></label>
+                  <label
+                    >Source page (optional)
+                    <span class="field-with-info">
+                      <input
+                        name="source-page"
+                        type="number"
+                        min="1"
+                        step="1"
+                        inputmode="numeric"
+                      />
+                      <span
+                        class="info-tooltip"
+                        tabindex="0"
+                        role="note"
+                        aria-label="This is the corresponding page number in the PDF of the Vorlesungsverzeichnis released by HFBK."
+                        data-tooltip="This is the corresponding page number in the PDF of the Vorlesungsverzeichnis released by HFBK."
+                        >i</span
+                      >
+                    </span>
+                  </label>
                 </div>
                 <div class="form-grid text-grid">
                   <label
@@ -378,6 +398,12 @@
           <div id="dataGuide" class="panel">
             <div class="questions uploadbox">
               <h2>Use your own course file</h2>
+              <p class="data-start-guidance">
+                To load an existing catalogue, choose your JSON data file below.
+                If you do not have one, use the <strong>Add course</strong> tab
+                to create courses with the guided form—no JSON editing is
+                needed.
+              </p>
               <p>
                 JSON is a plain-text file that keeps information in labelled
                 boxes for course names, texts, dates, and rooms. You do not need
@@ -396,6 +422,9 @@
                 or “Registered”.
               </p>
               <div class="upload-actions">
+                <label for="jsonUpload"
+                  ><strong>Choose your JSON data file</strong></label
+                >
                 <input
                   id="jsonUpload"
                   type="file"
