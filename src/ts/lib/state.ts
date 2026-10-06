@@ -2,6 +2,8 @@ import { hydrate } from "./catalog";
 import { readStored, writeStored } from "./storage";
 import type { Course, Lecture } from "./types";
 
+export type StatusFilter = "plan" | "registered";
+
 const PLAN_KEY = "hfbk-included-courses";
 const REGISTERED_KEY = "hfbk-registered-courses";
 
@@ -11,6 +13,7 @@ export class PlannerState {
   lectures: Lecture[] = [];
   subjects = new Set<string>();
   types = new Set<string>();
+  statuses = new Set<StatusFilter>();
   query = "";
   month = new Date();
   week = new Date();
@@ -28,6 +31,10 @@ export class PlannerState {
       (course) =>
         (!this.subjects.size || this.subjects.has(course.subject)) &&
         (!this.types.size || this.types.has(course.type)) &&
+        (!this.statuses.size ||
+          (this.statuses.has("plan") && this.included.has(course.id)) ||
+          (this.statuses.has("registered") &&
+            this.registered.has(course.id))) &&
         (!query || JSON.stringify(course).toLowerCase().includes(query)),
     );
   }
@@ -43,6 +50,7 @@ export class PlannerState {
     this.lectures = hydrate(courses);
     this.subjects.clear();
     this.types.clear();
+    this.statuses.clear();
     this.query = "";
 
     const ids = new Set(this.lectures.map((course) => course.id));

@@ -16,12 +16,14 @@ import { addDays } from "./lib/dates";
 import { $, $$, escapeHtml as esc } from "./lib/dom";
 import { FOCUS_COLORS, focus } from "./lib/focus";
 import { PlannerState } from "./lib/state";
+import type { StatusFilter } from "./lib/state";
 import { readStored, writeStored } from "./lib/storage";
 
 interface SavedList {
   name: string;
   subjects: string[];
   types: string[];
+  statuses?: StatusFilter[];
   query: string;
   included: string[];
   registered: string[];
@@ -71,6 +73,15 @@ function renderFilters(): void {
   $("#types").innerHTML = types
     .map((type) => filterControl("type", type, state.types.has(type)))
     .join("");
+  $("#statuses").innerHTML = [
+    filterControl("status", "plan", state.statuses.has("plan"), "In plan"),
+    filterControl(
+      "status",
+      "registered",
+      state.statuses.has("registered"),
+      "Registered",
+    ),
+  ].join("");
   $("#legend").innerHTML = [...new Set(state.lectures.map(focus))]
     .map(
       (group) =>
@@ -80,8 +91,13 @@ function renderFilters(): void {
 }
 
 /** Builds one checked filter control. */
-function filterControl(kind: string, value: string, checked: boolean): string {
-  return `<label class="check"><input type="checkbox" value="${esc(value)}" data-kind="${kind}" ${checked ? "checked" : ""}><span>${esc(value)}</span></label>`;
+function filterControl(
+  kind: string,
+  value: string,
+  checked: boolean,
+  label = value,
+): string {
+  return `<label class="check"><input type="checkbox" value="${esc(value)}" data-kind="${kind}" ${checked ? "checked" : ""}><span>${esc(label)}</span></label>`;
 }
 
 /** Renders course cards and the result count. */
@@ -243,6 +259,12 @@ document.addEventListener("change", (event) => {
     else selection.delete(target.value);
     render();
   }
+  if (target.dataset.kind === "status") {
+    const status = target.value as StatusFilter;
+    if (target.checked) state.statuses.add(status);
+    else state.statuses.delete(status);
+    render();
+  }
   if (target.dataset.courseToggle) {
     if (target.checked) state.included.add(target.dataset.courseToggle);
     else state.included.delete(target.dataset.courseToggle);
@@ -376,6 +398,7 @@ $("#saveList").onclick = () => {
     name,
     subjects: [...state.subjects],
     types: [...state.types],
+    statuses: [...state.statuses],
     query: state.query,
     included: [...state.included],
     registered: [...state.registered],
@@ -398,6 +421,7 @@ $<HTMLDivElement>("#savedLists").onclick = (event) => {
   const list = lists[index];
   state.subjects = new Set(list.subjects);
   state.types = new Set(list.types);
+  state.statuses = new Set(list.statuses ?? []);
   state.query = list.query;
   state.included = new Set(list.included);
   state.registered = new Set(list.registered);
