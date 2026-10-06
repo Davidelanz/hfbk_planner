@@ -13,6 +13,7 @@ This is an independent project and is not an official HFBK service.
 - Conflict ranking for selected courses
 - Guided course entry with exact or repeating dates, including break dates
 - Course editing from the overview
+- Automatic checks for missing or malformed course information
 - JSON import and export
 
 Subjects use the eight official HFBK study focuses plus **Other**. Course types use a short list of teaching formats so filters stay consistent.

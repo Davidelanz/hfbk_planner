@@ -31,7 +31,6 @@ export interface Course {
     events: EventTuple[];
     recurrence?: Recurrence;
     semester_break_excluded?: string[];
-    needs_input?: string[];
   };
   source?: { pdf_page?: number; user_confirmed_correction?: boolean };
 }
@@ -58,7 +57,7 @@ export interface Lecture {
   schedule: string;
   dates: string[];
   event_times: Record<string, { start: string | null; end: string | null }>;
-  needs_input: string[];
+  input_issues: string[];
   recurrence: Recurrence | null;
   semester_break_excluded: string[];
   registration_email: string;

@@ -63,13 +63,28 @@ export function normalizeCourseType(value: string): string {
   return "Other";
 }
 
-/** Normalizes imported classification labels without changing other data. */
+/** Normalizes imported classification labels and removes obsolete diagnostics. */
 export function normalizeCourseTaxonomy(course: Course): Course {
+  const calendar =
+    course.calendar && typeof course.calendar === "object"
+      ? { ...course.calendar }
+      : ({} as Course["calendar"]);
+  Reflect.deleteProperty(calendar, "needs_input");
+  const classification =
+    course.classification && typeof course.classification === "object"
+      ? course.classification
+      : { subject: "", type: "" };
+  const subject =
+    typeof classification.subject === "string" ? classification.subject : "";
+  const type =
+    typeof classification.type === "string" ? classification.type : "";
+
   return {
     ...course,
     classification: {
-      subject: normalizeSubject(course.classification.subject),
-      type: normalizeCourseType(course.classification.type),
+      subject: subject ? normalizeSubject(subject) : "",
+      type: type ? normalizeCourseType(type) : "",
     },
+    calendar,
   };
 }

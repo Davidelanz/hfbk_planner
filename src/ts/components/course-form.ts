@@ -43,18 +43,26 @@ export function populateCourseForm(
     >(`[name="${name}"]`);
     if (field) field.value = value;
   };
-  const recurrence = course.calendar.recurrence;
+  const recurrence = course.calendar?.recurrence;
+  const text = course.text as unknown;
+  const english = isRecord(text) ? text.en : undefined;
+  const german = isRecord(text) ? text.de : undefined;
+  const englishText = isRecord(english) ? english : {};
+  const germanText = isRecord(german) ? german : {};
 
-  setValue("title-en", course.text.en.title);
-  setValue("title-de", course.text.de.title);
-  setValue("subject", course.classification.subject);
-  setValue("type", course.classification.type);
-  setValue("instructors", course.details.instructors || "");
-  setValue("room", course.details.room || "");
-  setValue("body-en", course.text.en.body);
-  setValue("body-de", course.text.de.body);
-  setValue("machine-translation", course.text.machine_translation || "");
-  setValue("registration-email", course.registration.email || "");
+  setValue("title-en", stringValue(englishText.title));
+  setValue("title-de", stringValue(germanText.title));
+  setValue("subject", stringValue(course.classification?.subject));
+  setValue("type", stringValue(course.classification?.type));
+  setValue("instructors", stringValue(course.details?.instructors));
+  setValue("room", stringValue(course.details?.room));
+  setValue("body-en", stringValue(englishText.body));
+  setValue("body-de", stringValue(germanText.body));
+  setValue(
+    "machine-translation",
+    stringValue(isRecord(text) ? text.machine_translation : ""),
+  );
+  setValue("registration-email", stringValue(course.registration?.email));
   setValue("recurrence-start-date", "");
   setValue("recurrence-end-date", "");
   setValue("recurrence-weekday", "");
@@ -71,9 +79,15 @@ export function populateCourseForm(
   )!.checked = true;
 
   const rows = form.querySelector<HTMLDivElement>("#eventRows")!;
-  rows.innerHTML = course.calendar.events.length
-    ? course.calendar.events
-        .map(([date, start, end]) => eventRow(date, start || "", end || ""))
+  const events = course.calendar?.events as unknown;
+  const rowsToEdit = Array.isArray(events)
+    ? events.filter((event) => Array.isArray(event))
+    : [];
+  rows.innerHTML = rowsToEdit.length
+    ? rowsToEdit
+        .map(([date, start, end]) =>
+          eventRow(stringValue(date), stringValue(start), stringValue(end)),
+        )
         .join("")
     : eventRow();
 
@@ -95,9 +109,19 @@ export function populateCourseForm(
     setValue("recurrence-interval-weeks", `${interval}`);
     setValue(
       "recurrence-break-dates",
-      (course.calendar.semester_break_excluded || []).join(", "),
+      Array.isArray(course.calendar.semester_break_excluded)
+        ? course.calendar.semester_break_excluded.join(", ")
+        : "",
     );
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }
 
 /** Converts guided form fields to the portable course schema. */
@@ -116,13 +140,6 @@ export function courseFromForm(
       ?.value ?? "exact";
   const recurring = dateMode === "repeating" ? readRecurrence(value) : null;
   const events = recurring ? recurring.events : readEvents(form);
-  const needsInput: string[] = [];
-
-  if (!titleDe) needsInput.push("text.de.title");
-  if (!bodyEn) needsInput.push("text.en.body");
-  if (!bodyDe) needsInput.push("text.de.body");
-  if (dateMode !== "repeating" && !events.length)
-    needsInput.push("calendar.events");
 
   const translation = value("machine-translation");
   const slug = titleEn
@@ -138,8 +155,6 @@ export function courseFromForm(
       calendar.semester_break_excluded = recurring.semesterBreakExcluded;
     }
   }
-  if (needsInput.length) calendar.needs_input = needsInput;
-
   return {
     id:
       existingCourse?.id ||

@@ -1,4 +1,5 @@
-import type { Course, CoursePayload, Lecture } from "./types";
+import type { Course, CoursePayload, EventTuple, Lecture } from "./types";
+import { courseInputIssues } from "./course-input-checks";
 import {
   normalizeCourseTaxonomy,
   normalizeCourseType,
@@ -33,20 +34,41 @@ function scheduleLabel(course: Course): string {
 /** Derives render-ready fields from canonical course data. */
 export function hydrate(data: Course[]): Lecture[] {
   return data.map((course) => {
-    const events = course.calendar.events || [];
+    const rawEvents: unknown = course.calendar?.events;
+    const events: EventTuple[] = Array.isArray(rawEvents)
+      ? rawEvents.flatMap((event): EventTuple[] => {
+          if (!Array.isArray(event) || !isValidDate(event[0])) return [];
+          return [
+            [
+              event[0],
+              isValidTime(event[1]) ? event[1] : null,
+              isValidTime(event[2]) ? event[2] : null,
+            ],
+          ];
+        })
+      : [];
+    const titleEn = stringValue(course.text?.en?.title);
+    const titleDe = stringValue(course.text?.de?.title);
+    const machineTranslation = course.text?.machine_translation;
     return {
       id: course.id,
       page: course.source?.pdf_page,
-      subject: normalizeSubject(course.classification?.subject || ""),
-      type: normalizeCourseType(course.classification?.type || ""),
-      title_en: course.text?.en?.title || "",
-      body_en: course.text?.en?.body || "",
-      title_de: course.text?.de?.title || "",
-      body_de: course.text?.de?.body || "",
-      machine_translation_side: course.text?.machine_translation || null,
-      instructors: course.details?.instructors || "",
-      rooms: course.details?.room || "",
-      schedule: scheduleLabel(course),
+      subject: normalizeSubject(stringValue(course.classification?.subject)),
+      type: normalizeCourseType(stringValue(course.classification?.type)),
+      title_en: titleEn,
+      body_en: stringValue(course.text?.en?.body),
+      title_de: titleDe,
+      body_de: stringValue(course.text?.de?.body),
+      machine_translation_side:
+        machineTranslation === "en" || machineTranslation === "de"
+          ? machineTranslation
+          : null,
+      instructors: stringValue(course.details?.instructors),
+      rooms: stringValue(course.details?.room),
+      schedule: scheduleLabel({
+        ...course,
+        calendar: { ...course.calendar, events },
+      }),
       dates: events.map((event) => event[0]),
       event_times: Object.fromEntries(
         events.map((event) => [
@@ -54,17 +76,34 @@ export function hydrate(data: Course[]): Lecture[] {
           { start: event[1] || null, end: event[2] || null },
         ]),
       ),
-      needs_input: course.calendar?.needs_input || [],
+      input_issues: courseInputIssues(course),
       recurrence: course.calendar?.recurrence || null,
       semester_break_excluded: course.calendar?.recurrence
         ? course.calendar.semester_break_excluded || []
         : [],
-      registration_email: course.registration?.email || "",
+      registration_email: stringValue(course.registration?.email),
       registered_default: !!course.registration?.registered,
       plan_default: course.plan !== false,
       user_confirmed_correction: !!course.source?.user_confirmed_correction,
     };
   });
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function isValidDate(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return (
+    Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
+function isValidTime(value: unknown): value is string {
+  return typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
 /** Loads local data or returns an empty upload shell. */

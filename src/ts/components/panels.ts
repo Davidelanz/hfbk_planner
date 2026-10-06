@@ -2,15 +2,15 @@ import { formatDate, minutes } from "../lib/dates";
 import { escapeHtml as esc } from "../lib/dom";
 import type { Lecture } from "../lib/types";
 
-/** Renders courses with exact missing fields. */
+/** Renders courses with automatically detected missing or invalid fields. */
 export function questionsPanel(courses: Lecture[]): string {
-  const items = courses.filter((course) => course.needs_input.length);
+  const items = courses.filter((course) => course.input_issues.length);
   if (!items.length)
     return '<div class="empty"><strong>No missing fields in this selection.</strong></div>';
   return items
     .map(
       (course) =>
-        `<div class="question"><div><strong>${esc(course.title_en || course.title_de)}</strong><br><span>${esc(course.subject)} · PDF p. ${course.page ?? "?"}</span><ul class="missing-list">${course.needs_input.map((field) => `<li>${esc(field)}</li>`).join("")}</ul></div><a href="#${course.id}" data-course-link>Open course</a></div>`,
+        `<div class="question"><div><strong>${esc(course.title_en || course.title_de || "Untitled course")}</strong><br><span>${esc(course.subject)} · PDF p. ${course.page ?? "?"}</span><ul class="missing-list">${course.input_issues.map((issue) => `<li>${esc(issue)}</li>`).join("")}</ul></div><a href="#${course.id}" data-course-link>Open course</a></div>`,
     )
     .join("");
 }

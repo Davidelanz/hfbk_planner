@@ -165,8 +165,8 @@
             <div class="questions">
               <h2>Details to confirm</h2>
               <p>
-                Each course below lists the exact missing fields needed to
-                complete its calendar entry.
+                Courses below have missing or malformed information detected
+                automatically from their data.
               </p>
               <div id="questionList"></div>
             </div>
@@ -176,8 +176,8 @@
               <header class="form-intro">
                 <h2 id="courseFormTitle">Add a course</h2>
                 <p>
-                  Add the information you know. Empty optional fields are listed
-                  under Needs your input after saving.
+                  Add the information you know. Missing or malformed course
+                  fields are detected automatically after saving.
                 </p>
                 <p class="field-warning" role="alert">
                   Warning: added or edited courses stay in this browser session
@@ -393,8 +393,9 @@
               </div>
               <p>
                 Repeating courses may add <code>calendar.recurrence</code> and
-                <code>semester_break_excluded</code>. List missing fields in
-                <code>calendar.needs_input</code>.
+                <code>semester_break_excluded</code>. The app checks course data
+                automatically and does not require a diagnostics field in the
+                JSON.
               </p>
               <p>
                 Check

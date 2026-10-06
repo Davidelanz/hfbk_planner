@@ -22,7 +22,7 @@ export function courseCard(
       `<span class="fact">${esc(course.instructors)}</span>`,
     course.registration_email &&
       `<a class="fact" href="mailto:${esc(course.registration_email)}">Register: ${esc(course.registration_email)}</a>`,
-    course.needs_input.length &&
+    course.input_issues.length &&
       '<span class="fact needs">Needs confirmation</span>',
     course.user_confirmed_correction &&
       '<span class="fact">User-confirmed date correction</span>',
