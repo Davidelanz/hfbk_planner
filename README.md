@@ -4,6 +4,8 @@ A bilingual course planner with list, month, week, conflict, and missing-informa
 
 This is an independent project and is not an official HFBK service.
 
+![](./demo_1.jpg) ![](./demo_2.jpg)
+
 ## Features
 
 - English and German course descriptions
