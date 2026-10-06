@@ -5,10 +5,17 @@
   }
   .sidebar {
     position: static;
+    background-color: #eeeeee;
     height: auto;
-    padding-right: 0;
+    padding: 12px 9px;
     border-right: 0;
-    border-bottom: 1px solid var(--ink);
+    border-radius: 10px;
+    .side-section {
+      margin-top: 0px;
+    }
+    .side-title {
+      padding: 16px 0 0;
+    }
   }
   .columns {
     grid-template-columns: 1fr;
@@ -29,8 +36,17 @@
   }
 }
 @media (max-width: 560px) {
+  html {
+    font-size: 14px;
+  }
+  body {
+    font-size: 14px;
+  }
   .shell {
     padding: 12px;
+  }
+  .questions {
+    padding: 14px;
   }
   .lecture-body,
   summary {
@@ -38,5 +54,13 @@
   }
   .sum-title {
     font-size: 1rem;
+  }
+  .schema-help {
+    min-width: 0;
+  }
+  .schema-example {
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 }
