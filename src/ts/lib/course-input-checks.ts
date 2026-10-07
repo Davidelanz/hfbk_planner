@@ -141,8 +141,12 @@ export function courseInputIssues(course: Course): string[] {
     issues.push("Registration email must be text.");
   }
   const email = typeof emailValue === "string" ? emailValue.trim() : "";
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    issues.push("Registration email is not a valid email address.");
+  const emails = email
+    .split(/[,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (emails.some((item) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item))) {
+    issues.push("A registration email is not a valid email address.");
   }
 
   return issues;
