@@ -9,6 +9,7 @@ export const SUBJECTS = [
   "Malerei/Zeichnen",
   "Zeitbezogene Medien",
   "Theorie und Geschichte",
+  "Kunstpädagogik",
   "Other",
 ] as const;
 
@@ -32,6 +33,7 @@ export const SUBJECT_COLORS: Record<string, string> = {
   "Malerei/Zeichnen": "#d18b00",
   "Zeitbezogene Medien": "#0077b6",
   "Theorie und Geschichte": "#b84387",
+  Kunstpädagogik: "#a64d79",
   Other: "#68737d",
 };
 
@@ -48,6 +50,8 @@ const SUBJECT_ALIASES: Record<string, string> = {
   "Time-Based Media": "Zeitbezogene Medien",
   "Orientation · Time-Based Media": "Zeitbezogene Medien",
   "Theory / History": "Theorie und Geschichte",
+  "Art Education": "Kunstpädagogik",
+  Lehramt: "Kunstpädagogik",
 };
 
 /** Returns an official HFBK study focus when an old label is recognised. */
